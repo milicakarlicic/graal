@@ -236,7 +236,7 @@ public final class YoungGeneration extends Generation {
         return chunkBytes;
     }
 
-    UnsignedWord computeObjectBytes() {
+    public UnsignedWord computeObjectBytes() {
         return getEden().computeObjectBytes().add(computeSurvivorObjectBytes());
     }
 

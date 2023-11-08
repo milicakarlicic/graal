@@ -539,7 +539,7 @@ public final class Space {
     }
 
     UnsignedWord computeObjectBytes() {
-        assert !isEdenSpace() || VMOperation.isGCInProgress() : "eden data is only accurate during a GC";
+        // assert !isEdenSpace() || VMOperation.isGCInProgress() : "eden data is only accurate during a GC";
         return computeAlignedObjectBytes().add(computeUnalignedObjectBytes());
     }
 

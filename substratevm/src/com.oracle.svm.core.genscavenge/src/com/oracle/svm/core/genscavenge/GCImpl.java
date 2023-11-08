@@ -1319,7 +1319,7 @@ public final class GCImpl implements GC {
         }
     }
 
-    private static void printGCSummary() {
+    public static void printGCSummary() {
         if (!SerialGCOptions.PrintGCSummary.getValue()) {
             return;
         }

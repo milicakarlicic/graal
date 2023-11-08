@@ -87,19 +87,19 @@ public final class GCAccounting {
         return completeCollectionTotalNanos;
     }
 
-    UnsignedWord getTotalAllocatedChunkBytes() {
+    public UnsignedWord getTotalAllocatedChunkBytes() {
         return totalAllocatedChunkBytes;
     }
 
-    UnsignedWord getTotalCollectedChunkBytes() {
+    public UnsignedWord getTotalCollectedChunkBytes() {
         return totalCollectedChunkBytes;
     }
 
-    UnsignedWord getTotalCollectedObjectBytes() {
+    public UnsignedWord getTotalCollectedObjectBytes() {
         return totalCollectedObjectBytes;
     }
 
-    UnsignedWord getAllocatedObjectBytes() {
+    public UnsignedWord getAllocatedObjectBytes() {
         return allocatedObjectBytes;
     }
 
