@@ -14,6 +14,46 @@ public class MyGCHintsTest {
     record Data(int i) { }
 
     @Test
+    public void testGC() throws InterruptedException {
+        int n = 100_000_000;
+        Object[] array1 = new Object[n];
+
+        for (int i = 0; i < n; i++) {
+            array1[i] = i;
+        }
+
+        GCHints.printGenerationsInfo("-------------BEFORE GC--------------");
+        System.gc();
+        GCHints.printGenerationsInfo("-------------AFTER GC--------------");
+
+        array1 = new Object[n];
+
+        for (int i = 0; i < n; i++) {
+            array1[i] = i;
+        }
+
+        GCHints.printGenerationsInfo("-------------BEFORE GC--------------");
+        System.gc();
+        GCHints.printGenerationsInfo("-------------AFTER GC--------------");
+
+        array1 = new Object[n];
+
+        for (int i = 0; i < n; i++) {
+            array1[i] = i;
+        }
+
+        System.out.println(array1[0]);
+        System.out.println(array1[n - 1]);
+
+        GCHints.printGenerationsInfo("-------------BEFORE GC--------------");
+        System.gc();
+        GCHints.printGenerationsInfo("-------------AFTER GC--------------");
+        
+        GCHints.printGCSummary();
+    }
+
+
+    @Test
     public void testGCHeapPercent() throws InterruptedException {
         long startTime = System.nanoTime();
 

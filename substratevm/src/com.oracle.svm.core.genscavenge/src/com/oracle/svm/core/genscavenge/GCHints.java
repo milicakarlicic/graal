@@ -33,7 +33,7 @@ public class GCHints {
         return nanos / 1_000_000_000.0;
     }
 
-    public static void printGCSummary(long startTime) {
+    public static void printGCSummary() {
         GCAccounting accounting = GCImpl.getAccounting();
 
         System.out.println();
