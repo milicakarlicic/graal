@@ -56,10 +56,11 @@ public class GCHints {
 
         double gcTime = incrementalGCTime + completeGCTime;
         System.out.printf("  GC time: %.3fs\n", gcTime);
-        long runTime = System.nanoTime() - startTime;
-        System.out.printf("  Run time: %.3fs\n", convertToSeconds(runTime));
+        double mutatorNanos = convertToSeconds(GCImpl.getGCImpl().getTimers().mutator.getMeasuredNanos());
+        double runTime = gcTime + mutatorNanos;
+        System.out.printf("  Run time: %.3fs\n", runTime);
 
-        System.out.printf("  GC load: %d%% \n", (int) (gcTime / runTime * 100));
+        System.out.printf("  GC load: %d%% \n", (int) ((gcTime / runTime) * 100));
 
         System.out.println("==================================================");
     }

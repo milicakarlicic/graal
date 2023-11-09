@@ -113,6 +113,10 @@ public final class GCImpl implements GC {
     private final GCAccounting accounting = new GCAccounting();
     private final Timers timers = new Timers();
 
+    public Timers getTimers() {
+        return timers;
+    }
+
     private final CollectionVMOperation collectOperation = new CollectionVMOperation();
     private final ChunkReleaser chunkReleaser = new ChunkReleaser();
 
@@ -1331,6 +1335,12 @@ public final class GCImpl implements GC {
     private static class PrintGCSummaryOperation extends JavaVMOperation {
         protected PrintGCSummaryOperation() {
             super(VMOperationInfos.get(PrintGCSummaryOperation.class, "Print GC summary", SystemEffect.SAFEPOINT));
+        }
+
+        @Override
+        @Uninterruptible(reason = "Called from uninterruptible code.", mayBeInlined = true)
+        public boolean isGC() {
+            return true;
         }
 
         @Override
