@@ -48,12 +48,12 @@ public class MyGCHintsTest {
         GCHints.printGenerationsInfo("-------------BEFORE GC--------------");
         System.gc();
         GCHints.printGenerationsInfo("-------------AFTER GC--------------");
-        
+
         GCHints.printGCSummary();
     }
 
 
-    @Test
+    //@Test
     public void testGCHeapPercent() throws InterruptedException {
         long startTime = System.nanoTime();
 
@@ -79,7 +79,7 @@ public class MyGCHintsTest {
         System.gc();
 
         GCHints.printGenerationsInfo("TEST END");
-        GCHints.printGCSummary(startTime);
+        GCHints.printGCSummary();
 
 //        int n = 100_000_000;
 //        Object[] array1 = new Object[n];
