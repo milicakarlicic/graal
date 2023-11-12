@@ -1338,12 +1338,6 @@ public final class GCImpl implements GC {
         }
 
         @Override
-        @Uninterruptible(reason = "Called from uninterruptible code.", mayBeInlined = true)
-        public boolean isGC() {
-            return true;
-        }
-
-        @Override
         protected void operate() {
             ThreadLocalAllocation.disableAndFlushForAllThreads();
 

@@ -19,7 +19,7 @@ public class GCHints {
     public static void printGenerationsInfo(String message) {
         System.out.println();
         System.out.println("==================================================");
-        System.out.println(message);
+        System.out.println("================" + message + "================");
         System.out.println("Young generation size (in bytes): " + countYoungGenerationBytes());
         System.out.println("Old generation size (in bytes): " + countOldGenerationBytes());
         System.out.println("==================================================");

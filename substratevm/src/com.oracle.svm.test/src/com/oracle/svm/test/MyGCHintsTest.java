@@ -9,45 +9,47 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class MyGCHintsTest {
     record Data(int i) { }
 
     @Test
-    public void testGC() throws InterruptedException {
-        int n = 100_000_000;
-        Object[] array1 = new Object[n];
+    public void testGC() {
+        int n = 10_000_000;
+        Data[] array1 = new Data[n];
 
-        for (int i = 0; i < n; i++) {
-            array1[i] = i;
-        }
-
-        GCHints.printGenerationsInfo("-------------BEFORE GC--------------");
+        GCHints.printGenerationsInfo("BEFORE GC");
         System.gc();
-        GCHints.printGenerationsInfo("-------------AFTER GC--------------");
+        GCHints.printGenerationsInfo("AFTER GC");
 
-        array1 = new Object[n];
+        Assert.assertEquals(80, (int) SerialAndEpsilonGCOptions.MaximumHeapSizePercent.getValue());
+        Assert.assertEquals(10, (int) SerialAndEpsilonGCOptions.MaximumYoungGenerationSizePercent.getValue());
 
-        for (int i = 0; i < n; i++) {
-            array1[i] = i;
-        }
+        SerialAndEpsilonGCOptions.MaximumHeapSizePercent.update(30);
+        SerialAndEpsilonGCOptions.MaximumYoungGenerationSizePercent.update(5);
 
-        GCHints.printGenerationsInfo("-------------BEFORE GC--------------");
-        System.gc();
-        GCHints.printGenerationsInfo("-------------AFTER GC--------------");
+        Assert.assertEquals(30, (int) SerialAndEpsilonGCOptions.MaximumHeapSizePercent.getValue());
+        Assert.assertEquals(5, (int) SerialAndEpsilonGCOptions.MaximumYoungGenerationSizePercent.getValue());
 
-        array1 = new Object[n];
-
-        for (int i = 0; i < n; i++) {
-            array1[i] = i;
+        long prevYoungGenSize = 0;
+        for (int j = 0; j < 5; j++) {
+            for (int i = 0; i < n; i++) {
+                array1[i] = new Data(i);
+                long youngGenSize = GCHints.countYoungGenerationBytes();
+                if (youngGenSize != 0 && youngGenSize != prevYoungGenSize) {
+                    GCHints.printGenerationsInfo("LOOP STATE");
+                    prevYoungGenSize = youngGenSize;
+                }
+            }
         }
 
         System.out.println(array1[0]);
         System.out.println(array1[n - 1]);
 
-        GCHints.printGenerationsInfo("-------------BEFORE GC--------------");
+        GCHints.printGenerationsInfo("BEFORE GC");
         System.gc();
-        GCHints.printGenerationsInfo("-------------AFTER GC--------------");
+        GCHints.printGenerationsInfo("AFTER GC");
 
         GCHints.printGCSummary();
     }
