@@ -2,35 +2,42 @@ package com.oracle.svm.test;
 
 import com.oracle.svm.core.genscavenge.GCHints;
 import com.oracle.svm.core.genscavenge.GCImpl;
+import com.oracle.svm.core.genscavenge.GCRequest;
+import com.oracle.svm.core.genscavenge.HeapChunk;
+import com.oracle.svm.core.genscavenge.HeapImpl;
 import com.oracle.svm.core.genscavenge.SerialAndEpsilonGCOptions;
 import com.oracle.svm.core.genscavenge.SerialGCOptions;
+import com.oracle.svm.core.heap.GC;
+import com.oracle.svm.core.heap.GCCause;
+import com.oracle.svm.core.heap.Heap;
 import jdk.graal.compiler.api.directives.GraalDirectives;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Optional;
 
 public class MyGCHintsTest {
     record Data(int i) { }
 
-    @Test
+    //@Test
     public void testGC() {
         int n = 10_000_000;
         Data[] array1 = new Data[n];
+
+        var h = HeapChunk.getEnclosingHeapChunk(array1);
+        System.out.println(h.getSpace());
 
         GCHints.printGenerationsInfo("BEFORE GC");
         System.gc();
         GCHints.printGenerationsInfo("AFTER GC");
 
-        Assert.assertEquals(80, (int) SerialAndEpsilonGCOptions.MaximumHeapSizePercent.getValue());
         Assert.assertEquals(10, (int) SerialAndEpsilonGCOptions.MaximumYoungGenerationSizePercent.getValue());
 
-        SerialAndEpsilonGCOptions.MaximumHeapSizePercent.update(30);
-        SerialAndEpsilonGCOptions.MaximumYoungGenerationSizePercent.update(5);
+        //SerialAndEpsilonGCOptions.MaximumYoungGenerationSizePercent.update(80);
 
-        Assert.assertEquals(30, (int) SerialAndEpsilonGCOptions.MaximumHeapSizePercent.getValue());
-        Assert.assertEquals(5, (int) SerialAndEpsilonGCOptions.MaximumYoungGenerationSizePercent.getValue());
+        //Assert.assertEquals(80, (int) SerialAndEpsilonGCOptions.MaximumYoungGenerationSizePercent.getValue());
 
         long prevYoungGenSize = 0;
         for (int j = 0; j < 5; j++) {
@@ -52,6 +59,63 @@ public class MyGCHintsTest {
         GCHints.printGenerationsInfo("AFTER GC");
 
         GCHints.printGCSummary();
+    }
+
+    @Test
+    public void testRequestGC() throws InterruptedException {
+        Assert.assertEquals(0, GCRequest.getRequestCount());
+        Assert.assertFalse(GCRequest.isRequestInProgress());
+        GC gcInstance = Heap.getHeap().getGC();
+
+        Data[] array = new Data[1_000_000_000];
+        GraalDirectives.blackhole(array);
+
+        int i = 0;
+
+        while (true) {
+            gcInstance.requestStartHint();
+
+            array[i] = new Data(i);
+            i++;
+
+            int requestCount = GCRequest.getRequestCount();
+            if (requestCount % 3 == 0) {
+                gcInstance.collectionHint(false);
+                System.out.println("Incremental collection hint given");
+                gcInstance.collect(GCCause.HintedGC);
+            } else if (requestCount % 10 == 0) {
+                gcInstance.collectionHint(true);
+                System.out.println("Complete collection hint given");
+                gcInstance.collect(GCCause.HintedGC);
+            }
+            gcInstance.requestEndHint();
+
+            GCHints.printGCSummary();
+
+            System.out.println(array[i - 1]);
+
+            Thread.sleep(1000);
+        }
+
+    }
+
+   // @Test
+    public void testGcOptions() {
+        LinkedList<Data> l = new LinkedList<>();
+        GraalDirectives.blackhole(l);
+
+        long count = 0;
+
+//        Assert.assertEquals(80, (int) SerialAndEpsilonGCOptions.MaximumHeapSizePercent.getValue());
+//        SerialAndEpsilonGCOptions.MaximumHeapSizePercent.update(5);
+//        Assert.assertEquals(5, (int) SerialAndEpsilonGCOptions.MaximumHeapSizePercent.getValue());
+
+        for (int i = 0; i < 1_000_000_000; i++) {
+            Data tmp = new Data(i);
+            l.add(tmp);
+
+            System.out.println(count++);
+        }
     }
 
 

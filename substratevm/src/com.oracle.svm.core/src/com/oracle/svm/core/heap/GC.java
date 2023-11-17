@@ -25,6 +25,9 @@
 package com.oracle.svm.core.heap;
 
 public interface GC {
+    void requestStartHint();
+    void requestEndHint();
+
     /** Cause a collection of the Heap's choosing. */
     void collect(GCCause cause);
 

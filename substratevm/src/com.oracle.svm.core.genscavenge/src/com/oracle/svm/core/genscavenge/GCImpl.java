@@ -146,6 +146,16 @@ public final class GCImpl implements GC {
     }
 
     @Override
+    public void requestStartHint() {
+        GCRequest.beginRequest();
+    }
+
+    @Override
+    public void requestEndHint() {
+        GCRequest.endRequest();
+    }
+
+    @Override
     public void collect(GCCause cause) {
         collect(cause, false);
     }
